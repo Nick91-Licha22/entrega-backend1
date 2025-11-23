@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import crypto from "crypto";
 
 class ProductManager {
   constructor(path) {
