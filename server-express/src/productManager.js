@@ -17,7 +17,7 @@ class ProductManager {
       const newProduct = {
         id: crypto.randomUUID(), 
         status: true,            
-        thumbnails: [],          
+        thumbnails: "",          
         ...product
       };
 

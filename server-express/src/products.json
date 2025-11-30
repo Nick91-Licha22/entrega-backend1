@@ -8,7 +8,7 @@
     "status": true,
     "stock": 12,
     "category": "frutas",
-    "thumbnails": ["img/kiwi.jpg"]
+    "thumbnail": "Kiwi.jpeg"
   },
   {
     "id": "5",
@@ -19,6 +19,6 @@
     "status": true,
     "stock": 18,
     "category": "frutas",
-    "thumbnails": ["img/frutillas.jpg"]
+    "thumbnail": "Frutillas.jpeg"
   }
 ]
