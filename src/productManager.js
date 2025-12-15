@@ -9,15 +9,15 @@ class ProductManager {
   async addProduct(product) {
     try {
       const products = await this.getProducts();
-      
+
       if (!product.title || !product.description || !product.price || !product.code || !product.stock || !product.category) {
         throw new Error("Todos los campos son obligatorios");
       }
 
       const newProduct = {
-        id: crypto.randomUUID(), 
-        status: true,            
-        thumbnails: "",          
+        id: crypto.randomUUID(),
+        status: true,
+        thumbnails: "",
         ...product
       };
 
@@ -41,7 +41,7 @@ class ProductManager {
   async getProductById(id) {
     try {
       const products = await this.getProducts();
-      const product = products.find((p) => p.id == id); 
+      const product = products.find((p) => p.id == id);
       if (!product) throw new Error("Producto no encontrado");
       return product;
     } catch (error) {
@@ -69,13 +69,17 @@ class ProductManager {
   async deleteProduct(id) {
     try {
       const products = await this.getProducts();
-      const newProducts = products.filter((p) => p.id != id);
+      const initialLength = products.length;
+      const filteredProducts = products.filter((p) => p.id != id);
 
-      if (products.length === newProducts.length) {
+      if (initialLength === filteredProducts.length) {
         throw new Error("Producto no encontrado para eliminar");
       }
 
-      await fs.writeFile(this.path, JSON.stringify(newProducts, null, 2));
+      await fs.writeFile(this.path, JSON.stringify(filteredProducts, null, 2));
+
+      return id;
+
     } catch (error) {
       throw error;
     }
