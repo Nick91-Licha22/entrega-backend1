@@ -1,0 +1,49 @@
+<div class="container mt-5">
+    <h2 class="text-center text-success fw-bold mb-4 border-bottom pb-3">Tu Carrito de Compras</h2>
+
+    <div class="row g-4">
+        {{#each products}}
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-0 bg-dark text-white">
+                <img src="/img/{{this.product.thumbnail}}" class="card-img-top p-2 rounded" style="height: 200px; object-fit: cover;">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning fw-bold">{{this.product.title}}</h5>
+                    <p class="mb-1">Cantidad: <span class="badge bg-success">{{this.quantity}} Kilo(s)</span></p>
+                    <p class="mb-1 text-light small">Precio por Kilo: ${{this.product.price}}</p>
+                    <p class="fs-5">Subtotal: <span class="text-success fw-bold">${{multiply this.quantity this.product.price}}</span></p>
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                        <button onclick="updateQuantity('{{../cartId}}', '{{this.product._id}}', 'remove')" class="btn btn-outline-warning btn-sm">
+                            - 1 Kilo
+                        </button>
+                        
+                        <button onclick="updateQuantity('{{../cartId}}', '{{this.product._id}}', 'add')" class="btn btn-outline-success btn-sm">
+                            + 1 Kilo
+                        </button>
+                    </div>
+                    <button onclick="removeFromCart('{{../cartId}}', '{{this.product._id}}')" class="btn btn-danger btn-sm w-100 mt-2">
+                        Quitar Producto
+                    </button>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    {{#if products.length}}
+        <div class="mt-5 p-4 bg-light rounded shadow-sm text-end border">
+            <h3 class="fw-bold">Total de la compra: <span class="text-success">${{totalCart products}}</span></h3>
+            <hr>
+            <button onclick="checkout()" class="btn btn-success btn-lg px-5 shadow">
+                💳 Ir a Pagar
+            </button>
+        </div>
+    {{else}}
+        <div class="text-center mt-5 py-5 shadow-sm rounded bg-light border border-dashed">
+            <h4 class="text-muted">Tu carrito está vacío 🍊</h4>
+            <p>¿Qué te parece si agregas unas frutas frescas?</p>
+            <a href="/products" class="btn btn-success mt-3 px-4">Ir a la tienda</a>
+        </div>
+    {{/if}}
+</div>
+
+<script src="/js/cart.js"></script>
