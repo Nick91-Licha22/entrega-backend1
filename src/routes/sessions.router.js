@@ -44,4 +44,5 @@ router.get('/current', passport.authenticate('jwt', { session: false }), (req, r
     res.send({ status: "success", payload: req.user });
 });
 
+
 export default router;

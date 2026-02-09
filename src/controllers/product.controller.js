@@ -35,6 +35,7 @@ export const getAllProducts = async (req, res, next) => {
     } catch (error) { next(error); }
 };
 
+
 export const addProduct = async (req, res, next) => {
     try {
         const newProduct = await Product.create(req.body);

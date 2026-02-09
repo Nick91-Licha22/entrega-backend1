@@ -25,7 +25,6 @@ const productSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-
 productSchema.plugin(paginate);
 
 export const productModel = mongoose.model("Product", productSchema);

@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 
 dotenv.config(); 
 
-
 export const PRIVATE_KEY = process.env.JWT_SECRET || "ClaveScretaDeRespaldo";
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));

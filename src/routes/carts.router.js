@@ -10,6 +10,7 @@ cartsRouter.post("/", async (req, res) => {
         res.status(500).json({ status: "error", message: error.message });
     }
 });
+
 cartsRouter.post("/:cid/products/:pid", async (req, res) => {
     try {
         const { cid, pid } = req.params;
@@ -27,6 +28,7 @@ cartsRouter.post("/:cid/products/:pid", async (req, res) => {
         res.status(500).json({ status: "error", message: error.message });
     }
 });
+
 cartsRouter.delete("/:cid/products/:pid", async (req, res) => {
     try {
         const { cid, pid } = req.params;
@@ -48,6 +50,7 @@ cartsRouter.delete("/:cid/products/:pid", async (req, res) => {
         res.status(500).send({ status: "error", message: error.message });
     }
 });
+
 cartsRouter.delete("/:cid/products/:pid/all", async (req, res) => {
     try {
         const { cid, pid } = req.params;
@@ -59,10 +62,12 @@ cartsRouter.delete("/:cid/products/:pid/all", async (req, res) => {
         res.status(500).json({ status: "error", message: error.message });
     }
 });
+
 cartsRouter.delete("/:cid", async (req, res) => {
     await Cart.findByIdAndUpdate(req.params.cid, { products: [] });
     res.json({ status: "success", message: "Carrito vaciado" });
 });
+
 cartsRouter.get("/:cid", async (req, res) => {
     const cart = await Cart.findById(req.params.cid).populate("products.product").lean();
     res.json({ status: "success", payload: cart });

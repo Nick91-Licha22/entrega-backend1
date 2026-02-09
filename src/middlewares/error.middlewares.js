@@ -8,4 +8,5 @@ export const errorHandler = (error, req, res, next) => {
         status: "error",
         message: message
     });
+    
 };
