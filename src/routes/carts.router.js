@@ -1,5 +1,5 @@
 import express from "express";
-import Cart from "../models/cart.model.js";
+import Cart from "../dao/models/cart.model.js";
 
 const cartsRouter = express.Router();
 cartsRouter.post("/", async (req, res) => {
