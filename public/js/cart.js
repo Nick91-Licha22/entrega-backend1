@@ -141,4 +141,5 @@ const checkout = async () => {
             Swal.fire('Error', 'Hubo un problema al procesar la compra', 'error');
         }
     }
+    
 };
