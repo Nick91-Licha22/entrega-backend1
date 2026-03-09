@@ -3,7 +3,7 @@ import { userModel } from '../dao/models/user.model.js';
 import Cart from '../dao/models/cart.model.js'; 
 import { createHash, isValidPassword, generateToken } from '../utils.js';
 import passport from 'passport';
-
+import UserDTO from "../dto/user.dto.js";
 const router = Router();
 
 router.post('/register', async (req, res) => {
@@ -40,8 +40,10 @@ router.post('/login', async (req, res) => {
        .send({ status: "success", message: "Logged in" });
 });
 
-router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
-    res.send({ status: "success", payload: req.user });
+router.get('/current', passportCall('jwt'), (req, res) => {
+    const userDTO = new UserDTO(req.user); 
+
+    res.send({ status: "success", payload: userDTO });
 });
 
 
