@@ -3,8 +3,7 @@
 <div class="row g-4 realtime-content">
     <div class="col-12">
         <h1 class="realtime-title"> Productos en Tiempo Real (SYN VERDULERÍA)</h1>
-        <p class="lead">Agrega o elimina productos y observa cómo la lista se actualiza al instante en todos los
-            clientes conectados.</p>
+        <p class="lead">Agrega o elimina productos y observa cómo la lista se actualiza al instante en todos los clientes conectados.</p>
     </div>
 
     <div class="col-lg-4 col-md-5">
@@ -36,8 +35,7 @@
                     <input type="text" class="form-control" id="category" name="category" required>
                 </div>
                 <div class="mb-3">
-                    <label for="thumbnail" class="form-label">Nombre de Imagen (ej:
-                        manzana.jpeg)</label>
+                    <label for="thumbnail" class="form-label">Nombre de Imagen (ej: manzana.jpeg)</label>
                     <input type="text" class="form-control" id="thumbnail" name="thumbnail">
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Agregar Producto</button>
@@ -49,21 +47,18 @@
         <h3 class="text-success">Catálogo de Productos</h3>
         <div id="productsContainer" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {{#each products}}
-            <div class="col product-card-container" id="product-card-{{this.id}}">
+            <div class="col product-card-container" id="product-card-{{this._id}}">
                 <div class="card product-card">
                     <img src="/img/{{this.thumbnail}}" class="card-img-top" alt="{{this.title}}">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{this.title}}</h5>
-                        <p class="card-subtitle mb-2 text-muted small">ID: {{this.id}} |
-                            Código: {{this.code}}</p>
+                        <p class="card-subtitle mb-2 text-muted small">ID: {{this._id}} | Código: {{this.code}}</p>
                         <p class="card-text">{{this.description}}</p>
                         <p class="card-text mt-auto">
-                            <strong>Precio: ${{this.price}}</strong> | Stock:
-                            {{this.stock}}
+                            <strong>Precio: ${{this.price}}</strong> | Stock: {{this.stock}}
                         </p>
                         <span class="badge bg-success mb-2 align-self-start">{{this.category}}</span>
-                        <button class="btn btn-danger btn-sm w-100" onclick="deleteProduct('{{this.id}}')">Eliminar
-                            Producto</button>
+                        <button class="btn btn-danger btn-sm w-100" onclick="deleteProduct('{{this._id}}')">Eliminar Producto</button>
                     </div>
                 </div>
             </div>
@@ -73,4 +68,5 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/js/realTimeProducts.js"></script>

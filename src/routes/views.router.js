@@ -1,36 +1,69 @@
 import { Router } from "express";
-import { productModel } from "../dao/models/product.dao.js";
+import jwt from "jsonwebtoken";
+import { productModel } from "../dao/models/product.model.js";
 import Cart from "../dao/models/cart.model.js";
+import { PRIVATE_KEY } from "../utils.js"; 
 
 const router = Router();
+
+const checkAuth = (req, res, next) => {
+    const token = req.cookies.coderCookie || req.cookies.jwt; 
+    if (token) {
+        jwt.verify(token, PRIVATE_KEY, (err, decoded) => {
+            if (!err) req.user = decoded.user;
+        });
+    }
+    next();
+};
+
+router.use(checkAuth);
+
+router.get("/forgot-password", (req, res) => {
+    res.render("forgotPassword");
+});
+
+router.get("/reset-password", (req, res) => {
+    res.render("resetPassword");
+});
+
+router.get("/login", (req, res) => {
+    res.render("login"); 
+});
+
+router.get("/register", (req, res) => {
+    res.render("register"); 
+});
+
 router.get("/products", async (req, res) => {
     try {
         const { page = 1, limit = 8, category } = req.query;
         let filter = {};
-        if (category) {
-            filter.category = category; 
-        }
+        if (category) filter.category = category; 
 
         const { docs, ...pagination } = await productModel.paginate(filter, { page, limit, lean: true });
-        const prevLink = pagination.hasPrevPage ? `/products?page=${pagination.prevPage}${category ? `&category=${category}` : ''}` : null;
-        const nextLink = pagination.hasNextPage ? `/products?page=${pagination.nextPage}${category ? `&category=${category}` : ''}` : null;
+        
+        const cartId = req.user?.cart || null;
 
         res.render("home", { 
             products: docs, 
             pagination, 
             category,
-            prevLink,
-            nextLink
+            user: req.user,
+            cartId 
         });
     } catch (error) {
         res.status(500).send("Error al cargar productos");
     }
 });
+
 router.get("/products/:pid", async (req, res) => {
     try {
         const product = await productModel.findById(req.params.pid).lean();
         if (!product) return res.status(404).send("Producto no encontrado");
-        res.render("productDetail", { product });
+        
+        const cartId = req.user?.cart || null;
+
+        res.render("productDetail", { product, cartId, user: req.user });
     } catch (error) {
         res.status(400).send("ID no válido");
     }
@@ -38,15 +71,18 @@ router.get("/products/:pid", async (req, res) => {
 
 router.get("/carts/:cid", async (req, res) => {
     try {
+        if (!req.params.cid || req.params.cid === "undefined") {
+            return res.render("cart", { products: [] }); 
+        }
+
         const cart = await Cart.findById(req.params.cid).populate("products.product").lean();
-        if (!cart) return res.status(404).send("Carrito no encontrado");
         
-        res.render("cart", { 
-            cartId: cart._id, 
-            products: cart.products 
-        });
+        if (!cart) return res.render("cart", { products: [] });
+        
+        res.render("cart", { cartId: cart._id, products: cart.products });
     } catch (error) {
-        res.status(500).send("Error al cargar el carrito");
+        console.error("Error al cargar carrito:", error);
+        res.render("cart", { products: [] });
     }
 });
 
@@ -54,6 +90,5 @@ router.get("/realtimeproducts", async (req, res) => {
     const products = await productModel.find().lean();
     res.render("realTimeProducts", { products });
 });
-
 
 export default router;
