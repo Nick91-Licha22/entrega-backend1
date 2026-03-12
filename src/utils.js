@@ -1,9 +1,18 @@
-import passport from 'passport';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import passport from 'passport';
 
-export const PRIVATE_KEY = process.env.JWT_SECRET || "CoderSecretKeySecretisima";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export default __dirname;
+
+export const PRIVATE_KEY = process.env.JWT_SECRET || "CoderSecretKeySYN";
+
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+
 export const isValidPassword = (user, password) => {
     if (!user || !user.password) return false;
     return bcrypt.compareSync(password, user.password);
@@ -19,7 +28,7 @@ export const passportCall = (strategy) => {
             if (err) return next(err);
             if (!user) {
                 return res.status(401).send({
-                    error: info.messages ? info.messages : info.toString()
+                    error: info ? (info.messages || info.toString()) : "No autorizado"
                 });
             }
             req.user = user;
