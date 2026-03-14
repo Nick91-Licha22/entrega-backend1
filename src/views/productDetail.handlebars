@@ -10,14 +10,20 @@
             <h2 class="text-dark fw-bold mb-4">${{product.price}} <small class="text-muted fs-6">/ Kilo</small></h2>
             <p class="text-muted">Stock disponible: {{product.stock}} unidades</p>
 
-            <button 
-                onclick="addToCart('{{cartId}}', '{{product._id}}')" 
-                class="btn btn-success btn-lg mt-3 w-100 shadow">
-                🛒 Agregar al Carrito
-            </button>
+            {{#if cartId}}
+                <button 
+                    onclick="addToCart('{{cartId}}', '{{product._id}}')" 
+                    class="btn btn-success btn-lg mt-3 w-100 shadow">
+                    🛒 Agregar al Carrito
+                </button>
+            {{else}}
+                <a href="/login" class="btn btn-warning btn-lg mt-3 w-100 shadow">
+                    🔑 Iniciá sesión para comprar
+                </a>
+            {{/if}}
             
             <a href="/products" class="btn btn-outline-secondary mt-3 w-100">Volver al catálogo</a>
         </div>
     </div>
 </div>
-<script src="/js/cart.js"></script>
+

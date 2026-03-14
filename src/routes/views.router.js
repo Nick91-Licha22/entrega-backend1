@@ -1,94 +1,50 @@
-import { Router } from "express";
-import jwt from "jsonwebtoken";
-import { productModel } from "../dao/models/product.model.js";
-import Cart from "../dao/models/cart.model.js";
-import { PRIVATE_KEY } from "../utils.js"; 
+import { Router } from 'express';
+import { productModel } from '../dao/models/product.model.js';
+import { cartModel } from '../dao/models/cart.model.js';
+import { passportCall } from '../utils.js';
 
 const router = Router();
 
-const checkAuth = (req, res, next) => {
-    const token = req.cookies.coderCookie || req.cookies.jwt; 
-    if (token) {
-        jwt.verify(token, PRIVATE_KEY, (err, decoded) => {
-            if (!err) req.user = decoded.user;
-        });
-    }
-    next();
-};
-
-router.use(checkAuth);
-
-router.get("/forgot-password", (req, res) => {
-    res.render("forgotPassword");
-});
-
-router.get("/reset-password", (req, res) => {
-    res.render("resetPassword");
-});
-
-router.get("/login", (req, res) => {
-    res.render("login"); 
-});
-
-router.get("/register", (req, res) => {
-    res.render("register"); 
-});
-
-router.get("/products", async (req, res) => {
+router.get('/products', passportCall('jwt'), async (req, res) => {
     try {
-        const { page = 1, limit = 8, category } = req.query;
-        let filter = {};
-        if (category) filter.category = category; 
-
-        const { docs, ...pagination } = await productModel.paginate(filter, { page, limit, lean: true });
+        const { page = 1, category } = req.query;
+        const filter = category ? { category } : {};
+        const products = await productModel.paginate(filter, { page, limit: 8, lean: true });
         
-        const cartId = req.user?.cart || null;
-
-        res.render("home", { 
-            products: docs, 
-            pagination, 
-            category,
+        res.render('products', {
+            products: products.docs,
+            pagination: products,
             user: req.user,
-            cartId 
+            cartId: req.user ? req.user.cart : null 
         });
     } catch (error) {
-        res.status(500).send("Error al cargar productos");
+        res.status(500).render('error', { error: "Error al cargar productos" });
     }
 });
 
-router.get("/products/:pid", async (req, res) => {
+router.get('/carts/:cid', passportCall('jwt'), async (req, res) => {
     try {
-        const product = await productModel.findById(req.params.pid).lean();
-        if (!product) return res.status(404).send("Producto no encontrado");
-        
-        const cartId = req.user?.cart || null;
+        const { cid } = req.params;
+        const cart = await cartModel.findById(cid).populate('products.product').lean();
 
-        res.render("productDetail", { product, cartId, user: req.user });
+        if (!cart) return res.status(404).render('error', { message: 'Carrito no encontrado' });
+
+        const total = cart.products.reduce((acc, item) => {
+            return acc + (item.product ? item.product.price * item.quantity : 0);
+        }, 0);
+
+        res.render('cart', {
+            cartId: cid,
+            products: cart.products,
+            total: total.toFixed(2),
+            user: req.user
+        });
     } catch (error) {
-        res.status(400).send("ID no válido");
+        res.status(500).render('error', { error: 'Error al cargar el carrito' });
     }
 });
 
-router.get("/carts/:cid", async (req, res) => {
-    try {
-        if (!req.params.cid || req.params.cid === "undefined") {
-            return res.render("cart", { products: [] }); 
-        }
-
-        const cart = await Cart.findById(req.params.cid).populate("products.product").lean();
-        
-        if (!cart) return res.render("cart", { products: [] });
-        
-        res.render("cart", { cartId: cart._id, products: cart.products });
-    } catch (error) {
-        console.error("Error al cargar carrito:", error);
-        res.render("cart", { products: [] });
-    }
-});
-
-router.get("/realtimeproducts", async (req, res) => {
-    const products = await productModel.find().lean();
-    res.render("realTimeProducts", { products });
-});
+router.get('/login', (req, res) => res.render('login'));
+router.get('/register', (req, res) => res.render('register'));
 
 export default router;

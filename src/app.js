@@ -1,51 +1,46 @@
 import dotenv from 'dotenv';
-dotenv.config(); 
+dotenv.config();
 
 import express from 'express';
 import mongoose from 'mongoose';
 import handlebars from 'express-handlebars';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
+import path from 'path';
 
-import productsRouter from './routes/products.router.js';
+import viewsRouter from './routes/views.router.js';
 import cartsRouter from './routes/carts.router.js';
 import sessionsRouter from './routes/sessions.router.js';
-import viewsRouter from './routes/views.router.js';
-
+import productsRouter from './routes/products.router.js';
 import __dirname from './utils.js';
 import initializePassport from './config/passport.config.js';
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+
+app.engine('handlebars', handlebars.engine({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    }
+}));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'handlebars');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(`${__dirname}/../public`));
+app.use(express.static(path.join(__dirname, '../public')));
 app.use(cookieParser());
-
-app.engine('handlebars', handlebars.engine());
-app.set('views', `${__dirname}/views`);
-app.set('view engine', 'handlebars');
 
 initializePassport();
 app.use(passport.initialize());
 
-const MONGO_URI = process.env.URI_MONGODB; 
-
-console.log("Intentando conectar a MongoDB...");
-
-mongoose.connect(MONGO_URI)
-    .then(() => console.log("✅ Conectado a MongoDB con éxito"))
-    .catch(error => {
-        console.error("❌ Error al conectar a MongoDB:");
-        console.log(error.message);
-    });
+mongoose.connect(process.env.URI_MONGODB)
+    .then(() => console.log("✅ Conectado a MongoDB"))
+    .catch(err => console.log("❌ Error de conexión:", err));
 
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/', viewsRouter);
 
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor listo en http://localhost:${PORT}`);
-});
+app.listen(8080, () => console.log("🚀 Server listo en http://localhost:8080"));

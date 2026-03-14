@@ -41,6 +41,8 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -68,7 +70,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error al registrar',
-                    text: result.error || 'Verificá que el email no esté en uso',
+                    text: result.error || 'Verificá los datos ingresados',
                     confirmButtonColor: '#0d6efd'
                 });
             }
