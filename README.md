@@ -1,29 +1,37 @@
-# 🍎 Proyecto Ecommerce - SYN Verdulería (Backend II)
+# 🛒 SYN Verdulería - Final Backend Project
 
-##  Primera Entrega - Backend 2
-Este proyecto es un sistema de ecommerce para una verdulería que incluye gestión de productos, carritos y un sistema completo de usuarios con autenticación y autorización.
+Este es el proyecto final para el curso de Backend de Coderhouse. Consiste en un sistema de E-commerce completo enfocado en una verdulería, implementando una arquitectura profesional con persistencia en base de datos, seguridad y manejo de transacciones.
 
-###  Tecnologías Utilizadas
-* **Node.js & Express**
-* **MongoDB & Mongoose** (Base de datos NoSQL)
-* **Passport & JWT** (Autenticación basada en Cookies)
-* **Bcrypt** (Encriptación de contraseñas)
-* **Handlebars** (Motor de plantillas)
-* **Socket.io** (Actualizaciones en tiempo real)
+## 🚀 Tecnologías Utilizadas
 
----
+* **Node.js & Express:** Motor principal del servidor.
+* **MongoDB & Mongoose:** Base de datos NoSQL y modelado de datos.
+* **Passport & JWT:** Sistema de autenticación y manejo de sesiones mediante cookies.
+* **Bcrypt:** Hasheo de contraseñas para máxima seguridad.
+* **Handlebars:** Motor de plantillas para el renderizado de vistas dinámicas.
+* **SweetAlert2:** Notificaciones interactivas para el usuario.
 
-###  Funcionalidades de Seguridad Implementadas
+## 🛠️ Funcionalidades Implementadas
 
-1. **Modelo de Usuario:** Se implementó el modelo `User` con campos de nombre, apellido, email (único), edad, contraseña, rol y referencia a un carrito.
-2. **Encriptación:** Se utiliza `bcrypt.hashSync` para asegurar que las contraseñas nunca se guarden en texto plano.
-3. **Estrategia Passport-JWT:** Se configuró Passport para extraer el token de autenticación directamente desde las Cookies del navegador (`coderCookieToken`).
-4. **Endpoint `/current`:** Ruta protegida que valida el JWT del usuario logueado y devuelve su información.
+### 🔑 Autenticación y Autorización
+- **Registro y Login:** Los usuarios pueden crearse una cuenta y loguearse.
+- **JWT (JSON Web Token):** Las sesiones se manejan mediante tokens almacenados en cookies seguras (`httpOnly`).
+- **Passport:** Middleware para la protección de rutas.
+- **Estrategia Current:** Ruta `/api/sessions/current` para validar al usuario activo.
 
----
+### 🍎 Gestión de Productos
+- Catálogo dinámico renderizado desde MongoDB.
+- Sistema de **Paginación** con filtros por categoría.
+- Visualización de stock en tiempo real.
 
-###  Cómo ejecutar el proyecto
-1. Clonar el repositorio.
-2. Ejecutar `npm install` para instalar las dependencias.
-3. Crear un archivo `.env` en la raíz con las variables
-   ```env
+### 🛒 Carrito de Compras
+- Cada usuario tiene un carrito único asignado al registrarse.
+- Funcionalidades de **Agregar**, **Quitar** y **Vaciar** productos.
+- Persistencia total: el carrito no se pierde al cerrar sesión.
+
+### 🎫 Proceso de Compra (Ticket)
+- Al finalizar la compra, el sistema verifica el **stock disponible**.
+- Se descuenta el stock de los productos comprados.
+- Se genera un **Ticket de Compra** con un código único (`uuid`), fecha, monto total y el email del comprador.
+- Los productos que no tenían stock suficiente permanecen en el carrito para una futura compra.
+
