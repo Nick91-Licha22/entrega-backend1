@@ -1,37 +1,22 @@
-# 🛒 SYN Verdulería - Final Backend Project
+# Ecommerce Backend - Entrega Final (Re-entrega)
 
-Este es el proyecto final para el curso de Backend de Coderhouse. Consiste en un sistema de E-commerce completo enfocado en una verdulería, implementando una arquitectura profesional con persistencia en base de datos, seguridad y manejo de transacciones.
+Este proyecto es una plataforma de Ecommerce robusta desarrollada con **Node.js, Express y MongoDB**, siguiendo una arquitectura profesional de capas.
 
-## 🚀 Tecnologías Utilizadas
+## 🛠️ Mejoras y Correcciones Realizadas
 
-* **Node.js & Express:** Motor principal del servidor.
-* **MongoDB & Mongoose:** Base de datos NoSQL y modelado de datos.
-* **Passport & JWT:** Sistema de autenticación y manejo de sesiones mediante cookies.
-* **Bcrypt:** Hasheo de contraseñas para máxima seguridad.
-* **Handlebars:** Motor de plantillas para el renderizado de vistas dinámicas.
-* **SweetAlert2:** Notificaciones interactivas para el usuario.
+En esta versión se han corregido los puntos señalados en la entrega anterior, asegurando el desacoplamiento total de los componentes:
 
-## 🛠️ Funcionalidades Implementadas
+1.  **Modelo de Capas (Routing -> Controller -> Repository -> DAO):** Se eliminó la dependencia directa de los modelos de Mongoose en las rutas. Ahora la comunicación fluye a través de controladores y repositorios.
+2.  **Patrón Repository:** Implementado para centralizar la lógica de acceso a datos y permitir una fácil transición entre diferentes orígenes de datos si fuera necesario.
+3.  **DAO Completo:** Se enriquecieron los Data Access Objects con métodos CRUD completos, incluyendo un sistema de `populate` en carritos para asegurar la disponibilidad de datos de stock y precio.
+4.  **Sistema de Recuperación de Contraseña:** Implementado con envío de correos vía **Nodemailer**. Incluye validación de token (expira en 1h) y restricción para no repetir la contraseña anterior.
+5.  **DTO (Data Transfer Object):** La ruta `/api/sessions/current` ahora utiliza un `UserDTO` para filtrar información sensible antes de enviarla al cliente.
+6.  **Middleware de Autorización:** Se mejoró el sistema de roles para permitir validaciones por array, restringiendo acciones de Administrador y Usuario según la consigna.
+7.  **Lógica de Ticket y Compra:** Se implementó el modelo de `Tickets` y un proceso de compra que verifica stock, resta cantidades, genera el comprobante y mantiene en el carrito solo los productos sin disponibilidad.
 
-### 🔑 Autenticación y Autorización
-- **Registro y Login:** Los usuarios pueden crearse una cuenta y loguearse.
-- **JWT (JSON Web Token):** Las sesiones se manejan mediante tokens almacenados en cookies seguras (`httpOnly`).
-- **Passport:** Middleware para la protección de rutas.
-- **Estrategia Current:** Ruta `/api/sessions/current` para validar al usuario activo.
+## 🚀 Instalación y Uso
 
-### 🍎 Gestión de Productos
-- Catálogo dinámico renderizado desde MongoDB.
-- Sistema de **Paginación** con filtros por categoría.
-- Visualización de stock en tiempo real.
-
-### 🛒 Carrito de Compras
-- Cada usuario tiene un carrito único asignado al registrarse.
-- Funcionalidades de **Agregar**, **Quitar** y **Vaciar** productos.
-- Persistencia total: el carrito no se pierde al cerrar sesión.
-
-### 🎫 Proceso de Compra (Ticket)
-- Al finalizar la compra, el sistema verifica el **stock disponible**.
-- Se descuenta el stock de los productos comprados.
-- Se genera un **Ticket de Compra** con un código único (`uuid`), fecha, monto total y el email del comprador.
-- Los productos que no tenían stock suficiente permanecen en el carrito para una futura compra.
-
+1. Clonar el repositorio.
+2. Ejecutar `npm install`.
+3. Configurar el archivo `.env` con las variables: `JWT_SECRET`, `MONGO_URL`, `MAIL_USER` y `MAIL_PASS`.
+4. Iniciar con `npm start` en el puerto 8080.

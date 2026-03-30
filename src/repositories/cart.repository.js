@@ -2,13 +2,15 @@ export default class CartRepository {
     constructor(dao) { this.dao = dao; }
 
     getCartById = async (id) => {
-        const cart = await this.dao.getById(id);
-        if (!cart) return null;
         
-        return await cart.populate('products.product');
+        return await this.dao.getById(id);
     }
 
     updateCart = async (id, cart) => {
         return await this.dao.update(id, cart);
+    }
+
+    createCart = async () => {
+        return await this.dao.create();
     }
 }

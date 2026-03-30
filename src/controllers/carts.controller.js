@@ -1,48 +1,61 @@
 import { cartService, productService, ticketService } from "../repositories/index.js";
 import { v4 as uuidv4 } from 'uuid';
 
+export const addProductToCart = async (req, res) => {
+    try {
+        const { cid, pid } = req.params;
+        const cart = await cartService.getCartById(cid);
+        if (!cart) return res.status(404).send({ error: "Carrito no encontrado" });
+
+        const item = cart.products.find(p => p.product._id.toString() === pid);
+        if (item) {
+            item.quantity += 1;
+        } else {
+            cart.products.push({ product: pid, quantity: 1 });
+        }
+        
+        await cartService.updateCart(cid, cart);
+        res.send({ status: "success", message: "Producto agregado" });
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+};
+
 export const purchaseCart = async (req, res) => {
     try {
         const { cid } = req.params;
         const cart = await cartService.getCartById(cid);
-        
         if (!cart) return res.status(404).send({ status: "error", message: "Carrito no encontrado" });
 
-        const productsWithStock = [];
-        const productsWithoutStock = [];
         let totalAmount = 0;
+        const leftOver = [];
 
         for (const item of cart.products) {
-            const product = item.product;
-            if (product.stock >= item.quantity) {
-                product.stock -= item.quantity;
-                await productService.updateProduct(product._id, product);
-                totalAmount += product.price * item.quantity;
-                productsWithStock.push(item);
+            
+            if (item.product.stock >= item.quantity) {
+                item.product.stock -= item.quantity;
+                await productService.updateProduct(item.product._id, item.product);
+                totalAmount += (item.product.price * item.quantity);
             } else {
-                productsWithoutStock.push(item);
+                leftOver.push(item);
             }
         }
 
-        if (productsWithStock.length === 0) {
-            return res.status(400).send({ status: "error", message: "No hay stock suficiente para procesar la compra" });
+        if (totalAmount > 0) {
+            const ticket = await ticketService.createTicket({
+                code: uuidv4(),
+                amount: totalAmount,
+                purchaser: req.user.email 
+            });
+            
+            cart.products = leftOver;
+            await cartService.updateCart(cid, cart);
+            
+            return res.send({ status: "success", payload: ticket });
         }
-
-        const ticketData = {
-            code: uuidv4(),
-            purchase_datetime: new Date(),
-            amount: totalAmount,
-            purchaser: req.user.email
-        };
-
-        const ticket = await ticketService.createTicket(ticketData);
-
-        cart.products = productsWithoutStock;
-        await cartService.updateCart(cid, cart);
-
-        res.send({ status: "success", payload: ticket });
+        
+        res.status(400).send({ error: "No se pudo realizar la compra. Verifique el stock de los productos." });
     } catch (error) {
-        console.error(error);
-        res.status(500).send({ status: "error", message: "Error interno al procesar el pago" });
+        res.status(500).send({ error: "Error en el proceso de compra" });
     }
 };
