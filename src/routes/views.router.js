@@ -6,7 +6,8 @@ const router = Router();
 router.get('/products', async (req, res) => {
     try {
         const products = await productService.getProducts();
-        const cartId = req.user ? (req.user.cart._id || req.user.cart) : null;
+        
+        const cartId = req.user ? req.user.cart : null;
 
         res.render('products', { 
             products, 
@@ -14,26 +15,18 @@ router.get('/products', async (req, res) => {
             cartId: cartId 
         });
     } catch (error) {
-        res.status(500).render('error', { error: error.message });
+        console.error("Error en vista productos:", error);
+        res.render('error', { error: "No se pudieron cargar los productos" });
     }
 });
 
 router.get('/carts/:cid', async (req, res) => {
     try {
-        const cid = req.params.cid;
+        const { cid } = req.params;
         const cart = await cartService.getCartById(cid);
-        
-        const total = cart.products.reduce((acc, item) => {
-            return acc + (item.quantity * item.product.price);
-        }, 0);
-
-        res.render('cart', { 
-            products: cart.products, 
-            cartId: cid,
-            total: total
-        });
+        res.render('cart', { cart });
     } catch (error) {
-        res.status(500).render('error', { error: "No se pudo cargar el carrito" });
+        res.render('error', { error: "No se pudo cargar el carrito" });
     }
 });
 

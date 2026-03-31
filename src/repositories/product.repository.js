@@ -1,8 +1,25 @@
 export default class ProductRepository {
-    constructor(dao) { this.dao = dao; }
-    async getProducts(filter, options) { return await this.dao.getAll(filter, options); }
-    async getProductById(id) { return await this.dao.getById(id); }
-    async createProduct(data) { return await this.dao.create(data); }
-    async updateProduct(id, data) { return await this.dao.update(id, data); }
-    async deleteProduct(id) { return await this.dao.delete(id); }
+    constructor(dao) {
+        this.dao = dao;
+    }
+
+    getProducts = async () => {
+        return await this.dao.get(); 
+    }
+
+    getProductById = async (id) => {
+        return await this.dao.getById(id);
+    }
+
+    createProduct = async (product) => {
+        return await this.dao.create(product);
+    }
+
+    updateProduct = async (id, product) => {
+        return await this.dao.update(id, product);
+    }
+
+    deleteProduct = async (id) => {
+        return await this.dao.delete(id);
+    }
 }
