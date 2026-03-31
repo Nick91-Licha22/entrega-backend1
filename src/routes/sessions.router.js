@@ -3,7 +3,6 @@ import * as sessionsController from '../controllers/sessions.controller.js';
 import passport from 'passport';
 
 const router = Router();
-
 const passportCall = (strategy) => passport.authenticate(strategy, { session: false });
 
 router.post('/register', sessionsController.register);

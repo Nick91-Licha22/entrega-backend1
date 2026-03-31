@@ -1,10 +1,9 @@
 import { Router } from 'express';
-import * as productsController from '../controllers/product.controller.js';
+import * as productsController from '../controllers/product.controller.js'; 
 import { authorization } from '../middlewares/auth.middleware.js';
 import passport from 'passport';
 
 const router = Router();
-
 const passportCall = (strategy) => passport.authenticate(strategy, { session: false });
 
 router.get('/', productsController.getProducts);
