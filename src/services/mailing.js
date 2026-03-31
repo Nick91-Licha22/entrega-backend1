@@ -1,28 +1,35 @@
-import nodemailer from "nodemailer";
-import dotenv from "dotenv";
-
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     port: 587,
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS  
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS
     }
 });
 
-export const sendRecoveryMail = async (email, link) => {
-    return await transporter.sendMail({
-        from: "S&N Verdulería <no-reply@syn.com>",
-        to: email,
-        subject: "Restablecer Contraseña - S&N Verdulería",
-        html: `
-            <div style="font-family: Arial, sans-serif; border: 1px solid #198754; padding: 20px;">
-                <h2 style="color: #198754;">Recuperación de Contraseña</h2>
-                <p>Hacé clic en el siguiente botón para restablecer tu clave. Este link expira en 1 hora.</p>
-                <a href="${link}" style="display: inline-block; background-color: #198754; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Restablecer Clave</a>
-            </div>
-        `
-    });
+export const sendResetPasswordEmail = async (email, link) => {
+    try {
+        await transporter.sendMail({
+            from: `S&N Verdulería 🍎 <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: 'Restablecer tu contraseña',
+            html: `
+                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee;">
+                    <h1 style="color: #28a745;">S&N Verdulería</h1>
+                    <p>Hacé click en el botón para cambiar tu clave. <strong>Vence en 1 hora.</strong></p>
+                    <a href="${link}" style="background: #ffc107; color: black; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block;">
+                        CAMBIAR CONTRASEÑA
+                    </a>
+                </div>
+            `
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error en el servicio de mail:", error);
+        return { success: false, error };
+    }
 };

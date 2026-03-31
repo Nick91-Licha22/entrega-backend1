@@ -1,46 +1,39 @@
 import { Router } from 'express';
-import { productModel } from '../dao/models/product.model.js';
-import { cartModel } from '../dao/models/cart.model.js';
-import { passportCall } from '../utils.js';
+import { productService, cartService } from '../repositories/index.js';
 
 const router = Router();
 
-router.get('/products', passportCall('jwt'), async (req, res) => {
+router.get('/products', async (req, res) => {
     try {
-        const { page = 1, category } = req.query;
-        const filter = category ? { category } : {};
-        const products = await productModel.paginate(filter, { page, limit: 8, lean: true });
-        
-        res.render('products', {
-            products: products.docs,
-            pagination: products,
-            user: req.user,
-            cartId: req.user ? req.user.cart : null 
+        const products = await productService.getProducts();
+        const cartId = req.user ? (req.user.cart._id || req.user.cart) : null;
+
+        res.render('products', { 
+            products, 
+            user: req.user, 
+            cartId: cartId 
         });
     } catch (error) {
-        res.status(500).render('error', { error: "Error al cargar productos" });
+        res.status(500).render('error', { error: error.message });
     }
 });
 
-router.get('/carts/:cid', passportCall('jwt'), async (req, res) => {
+router.get('/carts/:cid', async (req, res) => {
     try {
-        const { cid } = req.params;
-        const cart = await cartModel.findById(cid).populate('products.product').lean();
-
-        if (!cart) return res.status(404).render('error', { message: 'Carrito no encontrado' });
-
+        const cid = req.params.cid;
+        const cart = await cartService.getCartById(cid);
+        
         const total = cart.products.reduce((acc, item) => {
-            return acc + (item.product ? item.product.price * item.quantity : 0);
+            return acc + (item.quantity * item.product.price);
         }, 0);
 
-        res.render('cart', {
+        res.render('cart', { 
+            products: cart.products, 
             cartId: cid,
-            products: cart.products,
-            total: total.toFixed(2),
-            user: req.user
+            total: total
         });
     } catch (error) {
-        res.status(500).render('error', { error: 'Error al cargar el carrito' });
+        res.status(500).render('error', { error: "No se pudo cargar el carrito" });
     }
 });
 
