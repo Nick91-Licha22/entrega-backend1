@@ -4,8 +4,15 @@ import { passportCall, authorization } from '../utils.js';
 
 const router = Router();
 
-router.post('/:cid/product/:pid', passportCall('jwt'), authorization(['user']), cartsController.addProductToCart);
+router.post('/:cid/product/:pid', 
+    passportCall('jwt'), 
+    authorization(['user', 'admin']), 
+    cartsController.addProductToCart
+);
 
-router.post('/:cid/purchase', passportCall('jwt'), cartsController.purchaseCart);
+router.post('/:cid/purchase', 
+    passportCall('jwt'), 
+    cartsController.purchaseCart
+);
 
 export default router;

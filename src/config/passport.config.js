@@ -23,7 +23,6 @@ const initializePassport = () => {
         try {
             const user = await userService.getUserByEmail(email);
             if (!user) {
-                console.log("Usuario no existe");
                 return done(null, false, { message: "Usuario no encontrado" });
             }
             if (!isValidPassword(user, password)) {
@@ -40,7 +39,8 @@ const initializePassport = () => {
         secretOrKey: process.env.JWT_SECRET || 'CoderSecretKeySYN'
     }, async (jwt_payload, done) => {
         try {
-            return done(null, jwt_payload);
+            // El payload ahora contiene toda la info del usuario, incluido el cart
+            return done(null, jwt_payload.user ? jwt_payload.user : jwt_payload);
         } catch (error) {
             return done(error);
         }

@@ -13,24 +13,26 @@
         .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .btn-success { background-color: #28a745; border: none; border-radius: 10px; }
         .btn-warning { background-color: #ffc107; border: none; font-weight: bold; }
-        .badge-cart { position: absolute; top: -5px; right: -5px; }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow-sm sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center" href="/products">
-                <span style="font-size: 1.5rem; margin-right: 10px;">🥗</span> S&N VERDULERÍA
+                <span style="font-size: 1.5rem; margin-right: 10px;"></span> S&N VERDULERÍA
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link" href="/products">Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products">Todos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products?category=fruta">Frutas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products?category=verdura">Verduras</a></li>
+                    
                     {{#if user}}
                         <li class="nav-item">
-                            <a class="nav-link btn btn-warning text-dark ms-lg-3 px-4 position-relative" href="/carts/{{user.cart}}">
+                            <a class="nav-link btn btn-warning text-dark ms-lg-3 px-4" href="/carts/{{cartId}}">
                                 🛒 Mi Carrito
                             </a>
                         </li>
