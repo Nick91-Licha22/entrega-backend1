@@ -6,16 +6,12 @@ import handlebars from 'express-handlebars';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
 
 import viewsRouter from './routes/views.router.js';
 import cartsRouter from './routes/carts.router.js';
 import sessionsRouter from './routes/sessions.router.js';
 import productsRouter from './routes/products.router.js';
-
-
-import __dirname from './utils.js';
+import __dirname from './utils.js'; 
 import initializePassport from './config/passport.config.js';
 
 const app = express();
@@ -32,21 +28,21 @@ const hbs = handlebars.create({
 });
 
 app.engine('handlebars', hbs.engine);
-app.set('views', path.join(__dirname, 'views'));
+// Ahora __dirname es la raíz, así que buscamos src/views y public directamente
+app.set('views', path.join(__dirname, 'src', 'views'));
 app.set('view engine', 'handlebars');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-
 app.use((req, res, next) => {
     res.setHeader("Content-Security-Policy", "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; style-src * 'unsafe-inline';");
     next();
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(express.static(path.join(__dirname, 'public')));
 
 initializePassport();
 app.use(passport.initialize());
@@ -54,14 +50,10 @@ app.use(passport.initialize());
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/sessions', sessionsRouter);
-
-
 app.use('/', viewsRouter);
 
-
 mongoose.connect(process.env.URI_MONGODB)
-    .then(() => console.log("✅ Conectado a MongoDB"))
+    .then(() => console.log("✅ Conectado a MongoDB Atlas"))
     .catch(err => console.error("❌ Error Mongo:", err));
 
-const PORT = 8080;
-app.listen(PORT, () => console.log(`🚀 S&N Verdulería funcionando en: http://localhost:8080`));
+app.listen(8080, () => console.log("🚀 S&N Verdulería: http://localhost:8080"));

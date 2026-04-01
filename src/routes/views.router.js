@@ -5,7 +5,7 @@ import { passportCall } from '../utils.js';
 const router = Router();
 
 router.get('/products', passportCall('jwt'), viewsController.renderProducts);
-router.get('/cart/:cid', passportCall('jwt'), viewsController.renderCart);
+router.get('/carts/:cid', passportCall('jwt'), viewsController.renderCart);
 
 router.get('/login', (req, res) => res.render('login'));
 router.get('/register', (req, res) => res.render('register'));
