@@ -2,21 +2,22 @@ import { productService, cartService } from '../repositories/index.js';
 
 export const renderProducts = async (req, res) => {
     try {
-        // Usamos el Repository (productService es una instancia de ProductRepository)
         const result = await productService.getProducts(req.query);
         
-        // El Repository ya debería devolvernos los datos limpios o usamos toObject
-        const products = result.docs 
+        // Normalizamos los productos para que Handlebars no los bloquee
+        const products = (result && result.docs) 
             ? result.docs.map(d => d.toObject()) 
-            : result.map(d => d.toObject());
+            : (Array.isArray(result) ? result.map(d => d.toObject()) : []);
 
         res.render('products', { 
             products, 
             user: req.user, 
+            cartId: req.user ? req.user.cart : null, // ID del carrito para el botón superior
             style: 'index.css' 
         });
     } catch (error) {
-        res.render('error', { error: 'Error al cargar productos' });
+        console.error("Error en renderProducts:", error);
+        res.render('error', { error: 'No se pudieron cargar los productos' });
     }
 };
 
@@ -38,6 +39,7 @@ export const renderCart = async (req, res) => {
             user: req.user 
         });
     } catch (error) {
-        res.render('error', { error: 'Error al cargar el carrito' });
+        console.error("Error en renderCart:", error);
+        res.render('error', { error: 'Error al cargar la vista del carrito' });
     }
 };

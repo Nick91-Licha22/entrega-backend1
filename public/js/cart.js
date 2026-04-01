@@ -1,44 +1,55 @@
 const addToCart = async (cartId, productId) => {
-    if (!cartId || cartId === "undefined" || cartId === "[object Object]") {
-        return Swal.fire('Oops', 'No se detectó tu carrito. Por favor reingresa.', 'warning');
+    // Si el cartId es inválido, lo buscamos en el atributo data del body
+    let id = (cartId && cartId !== "undefined" && cartId !== "[object Object]") 
+             ? cartId 
+             : document.body.dataset.cartid;
+
+    if (!id || id === "undefined") {
+        return Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'No tienes un carrito asignado. Cierra sesión y vuelve a entrar para sincronizar.'
+        });
     }
 
     try {
-        const response = await fetch(`/api/carts/${cartId}/product/${productId}`, { method: 'POST' });
+        const response = await fetch(`/api/carts/${id}/product/${productId}`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
         if (response.ok) {
-            Swal.fire({ title: '¡Agregado!', icon: 'success', timer: 1000, showConfirmButton: false, toast: true, position: 'top-end' });
+            Swal.fire({
+                title: '¡Agregado!',
+                icon: 'success',
+                timer: 1000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
         } else {
-            Swal.fire('Error', 'No tienes permiso o no hay stock', 'error');
+            Swal.fire('Error', 'No se pudo agregar el producto', 'error');
         }
     } catch (error) {
-        Swal.fire('Error', 'Error de conexión', 'error');
+        Swal.fire('Error', 'Error de red', 'error');
     }
 };
 
 const finalizePurchase = async (cartId) => {
-    Swal.fire({ title: 'Procesando Compra...', didOpen: () => Swal.showLoading() });
-
+    Swal.fire({ title: 'Procesando...', didOpen: () => Swal.showLoading() });
     try {
         const response = await fetch(`/api/carts/${cartId}/purchase`, { method: 'POST' });
         const data = await response.json();
-
         if (response.ok) {
             Swal.fire({
                 icon: 'success',
                 title: 'Compra Exitosa',
-                html: `
-                    <div style="text-align: left; padding: 10px; background: #eee; border-radius: 5px;">
-                        <p><strong>Ticket:</strong> ${data.payload.code}</p>
-                        <p><strong>Total:</strong> $${data.payload.amount}</p>
-                        <p><strong>Email:</strong> ${data.payload.purchaser}</p>
-                    </div>
-                `,
-                confirmButtonText: 'Genial'
+                html: `<p>Ticket: <b>${data.payload.code}</b></p><p>Total: <b>$${data.payload.amount}</b></p>`,
             }).then(() => window.location.href = '/products');
         } else {
-            Swal.fire('Error', data.error || 'Problema con el stock', 'error');
+            Swal.fire('Error', data.error || 'Error en la compra', 'error');
         }
     } catch (error) {
-        Swal.fire('Error', 'Error en el servidor', 'error');
+        Swal.fire('Error', 'Error de servidor', 'error');
     }
 };
