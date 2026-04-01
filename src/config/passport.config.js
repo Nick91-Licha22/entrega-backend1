@@ -39,8 +39,8 @@ const initializePassport = () => {
         secretOrKey: process.env.JWT_SECRET || 'CoderSecretKeySYN'
     }, async (jwt_payload, done) => {
         try {
-            // El payload ahora contiene toda la info del usuario, incluido el cart
-            return done(null, jwt_payload.user ? jwt_payload.user : jwt_payload);
+            const user = jwt_payload.user ? jwt_payload.user : jwt_payload;
+            return done(null, user);
         } catch (error) {
             return done(error);
         }

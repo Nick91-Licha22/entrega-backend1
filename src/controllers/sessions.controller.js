@@ -26,9 +26,26 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-    if (!req.user) return res.status(400).send({ status: "error", error: "Credenciales inválidas" });
-    const token = generateToken(req.user);
-    res.cookie('coderCookieToken', token, { maxAge: 3600000, httpOnly: true }).send({ status: "success" });
+    try {
+        if (!req.user) return res.status(400).send({ status: "error", error: "Credenciales inválidas" });
+        if (!req.user.cart) {
+            const newCart = await cartService.createCart();
+            req.user.cart = newCart._id;
+            await userService.updateUser(req.user._id, { cart: newCart._id });
+        }
+
+        const token = generateToken(req.user);
+        
+        res.cookie('coderCookieToken', token, { 
+            maxAge: 3600000, 
+            httpOnly: true 
+        }).send({ 
+            status: "success", 
+            cartId: req.user.cart 
+        });
+    } catch (error) {
+        res.status(500).send({ status: "error", error: error.message });
+    }
 };
 
 export const current = async (req, res) => {

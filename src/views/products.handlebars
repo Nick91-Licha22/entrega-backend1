@@ -36,25 +36,3 @@
         {{/each}}
     </div>
 </div>
-
-<script>
-function addToCart(cartId, productId) {
-    if (!cartId || cartId === "undefined" || cartId === "null") {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'No tienes un carrito asignado. Cierra sesión y vuelve a entrar.',
-            confirmButtonColor: '#28a745'
-        });
-        return;
-    }
-
-    fetch(`/api/carts/${cartId}/product/${productId}`, { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === "success") {
-                Swal.fire({ icon: 'success', title: '¡Listo!', text: 'Producto agregado', timer: 1500, showConfirmButton: false });
-            }
-        });
-}
-</script>

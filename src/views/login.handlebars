@@ -32,7 +32,15 @@
                 headers: { 'Content-Type': 'application/json' }
             });
 
+            const result = await response.json();
+
             if (response.ok) {
+                const cartId = result.cartId || (result.payload && result.payload.cart) || (result.user && result.user.cart);
+                
+                if (cartId) {
+                    localStorage.setItem('cartId', cartId);
+                }
+
                 Swal.fire({
                     icon: 'success',
                     title: '¡Bienvenido!',
@@ -46,7 +54,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error de Login',
-                    text: 'Email o contraseña incorrectos',
+                    text: result.error || 'Email o contraseña incorrectos',
                     confirmButtonColor: '#198754'
                 });
             }

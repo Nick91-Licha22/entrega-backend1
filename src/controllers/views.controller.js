@@ -1,33 +1,43 @@
-import { productService, cartService } from "../repositories/index.js";
+import { productService, cartService } from '../repositories/index.js';
 
 export const renderProducts = async (req, res) => {
     try {
-        const { page = 1, limit = 10, sort, query } = req.query;
-        const products = await productService.getProducts(page, limit, sort, query);
+        // Usamos el Repository (productService es una instancia de ProductRepository)
+        const result = await productService.getProducts(req.query);
         
-        const userCartId = req.user?.cart || "696556c1969868926e6ddd6e"; 
+        // El Repository ya debería devolvernos los datos limpios o usamos toObject
+        const products = result.docs 
+            ? result.docs.map(d => d.toObject()) 
+            : result.map(d => d.toObject());
 
-        res.render("products", { 
-            products: products.docs,
-            pagination: products,
-            cartId: userCartId, 
-            user: req.user 
+        res.render('products', { 
+            products, 
+            user: req.user, 
+            style: 'index.css' 
         });
     } catch (error) {
-        res.status(500).render("error", { error: error.message });
+        res.render('error', { error: 'Error al cargar productos' });
     }
 };
 
-export const renderProductDetail = async (req, res) => {
+export const renderCart = async (req, res) => {
     try {
-        const product = await productService.getProductById(req.params.pid);
-        const userCartId = req.user?.cart || "696556c1969868926e6ddd6e";
+        const { cid } = req.params;
+        const cart = await cartService.getCartById(cid);
+        
+        if (!cart) return res.render('error', { error: 'Carrito no encontrado' });
 
-        res.render("productDetail", { 
-            product, 
-            cartId: userCartId 
+        const products = cart.products.map(item => ({
+            product: item.product.toObject ? item.product.toObject() : item.product,
+            quantity: item.quantity
+        }));
+
+        res.render('cart', { 
+            products, 
+            cartId: cid,
+            user: req.user 
         });
     } catch (error) {
-        res.status(404).render("error", { error: "Producto no encontrado" });
+        res.render('error', { error: 'Error al cargar el carrito' });
     }
 };
